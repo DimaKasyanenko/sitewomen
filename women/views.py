@@ -1,13 +1,49 @@
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 
-menu = ['О сайте', 'Добавать статью', 'Обратная связь', 'Войти']
+menu = [
+    {'title': 'О сайте', 'url_name': 'about'},
+    {'title': 'Добавать статью', 'url_name': 'add_page'},
+    {'title': 'Обратная связь', 'url_name': 'contact'},
+    {'title': 'Войти', 'url_name': 'login'}
+]
+
+data_db = [
+    {'id': 1, 'title': 'Анджелина Джоли', 'content': """Анджелина Джоли (при рождении Войт) — американская актриса кино, телевидения и озвучивания, кинорежиссёр, сценаристка, продюсер, фотомодель.
+Обладательница премии «Оскар», трёх премий «Золотой глобус» (первая актриса в истории, три года подряд выигравшая награду) и двух «Премий Гильдии киноактёров США».""",
+     'is_published': True},
+    {'id': 2, 'title': 'Марго Робби', 'content': 'Биография Марго Робби', 'is_published': False},
+    {'id': 3, 'title': 'Джулия Роберст', 'content': 'Биография Джулии Роберст', 'is_published': True},
+]
+
+
+cats_db = [
+    {'id': 1, 'name': 'Актрисы'},
+    {'id': 2, 'name': 'Певицы'},
+    {'id': 3, 'name': 'Спортсменки'},
+]
 
 
 def index(request):
     data = {
-        'title': 'Главная',
-        'menu': menu
+        'title': 'Главная страница',
+        'menu': menu,
+        'posts': data_db,
+        'category_selected': 0,
+    }
+    return render(request, 'women/index.html', context=data)
+
+
+def show_post(request, post_id):
+    return HttpResponse(f"Отображение статьи с id = {post_id}")
+
+
+def show_category(request, category_id):
+    data = {
+        'title': 'Отображение по рубрикам',
+        'menu': menu,
+        'posts': data_db,
+        'category_selected': category_id,
     }
     return render(request, 'women/index.html', context=data)
 
@@ -20,18 +56,16 @@ def about(request):
     return render(request, 'women/about.html', context=data)
 
 
-def category_by_id(request, category_id):
-    return HttpResponse(f"Posts from category, {category_id}")
+def addpage(request):
+    return HttpResponse("Добавление статьи")
 
 
-def category_by_slug(request, category_slug):
-    return HttpResponse(f"Posts from category, {category_slug}")
+def contact(request):
+    return HttpResponse("Обратная связь")
 
 
-def archive(request, year):
-    if year > 2023:
-        raise Http404()
-    return HttpResponse(f"Archive post, {year}")
+def login(request):
+    return HttpResponse("Страница авторизации")
 
 
 def page_not_found(request, exception):

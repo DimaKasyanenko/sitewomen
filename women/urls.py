@@ -6,8 +6,10 @@ register_converter(converters.FourDigitYearConverter, "year4")
 
 urlpatterns = [
     path('', index, name='home'),
+    path('post/<int:post_id>/', show_post, name='post'),
+    path('category/<int:category_id>/', show_category, name='category'),
     path('about/', about, name='about'),
-    path('category/<int:category_id>', category_by_id, name='category_id'),
-    path('category/<slug:category_slug>', category_by_slug, name='category_slug'),
-    path('archive/<year4:year>/', archive, name='archive'),
+    path('contact/', contact, name='contact'),
+    path('addpage/', addpage, name='add_page'),
+    path('login/', login, name='login'),
 ]
