@@ -1,5 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+
+from women.models import Women, Category
 
 menu = [
     {'title': 'О сайте', 'url_name': 'about'},
@@ -8,42 +10,43 @@ menu = [
     {'title': 'Войти', 'url_name': 'login'}
 ]
 
-data_db = [
-    {'id': 1, 'title': 'Анджелина Джоли', 'content': """Анджелина Джоли (при рождении Войт) — американская актриса кино, телевидения и озвучивания, кинорежиссёр, сценаристка, продюсер, фотомодель.
-Обладательница премии «Оскар», трёх премий «Золотой глобус» (первая актриса в истории, три года подряд выигравшая награду) и двух «Премий Гильдии киноактёров США».""",
-     'is_published': True},
-    {'id': 2, 'title': 'Марго Робби', 'content': 'Биография Марго Робби', 'is_published': False},
-    {'id': 3, 'title': 'Джулия Роберст', 'content': 'Биография Джулии Роберст', 'is_published': True},
-]
-
-
-cats_db = [
-    {'id': 1, 'name': 'Актрисы'},
-    {'id': 2, 'name': 'Певицы'},
-    {'id': 3, 'name': 'Спортсменки'},
-]
+# cats_db = [
+#     {'id': 1, 'name': 'Актрисы'},
+#     {'id': 2, 'name': 'Певицы'},
+#     {'id': 3, 'name': 'Спортсменки'},
+# ]
 
 
 def index(request):
+    posts = Women.published.all()
     data = {
         'title': 'Главная страница',
         'menu': menu,
-        'posts': data_db,
+        'posts': posts,
         'category_selected': 0,
     }
     return render(request, 'women/index.html', context=data)
 
 
-def show_post(request, post_id):
-    return HttpResponse(f"Отображение статьи с id = {post_id}")
-
-
-def show_category(request, category_id):
+def show_post(request, post_slug):
+    post = get_object_or_404(Women, slug=post_slug)
     data = {
-        'title': 'Отображение по рубрикам',
+        'title': post.title,
         'menu': menu,
-        'posts': data_db,
-        'category_selected': category_id,
+        'post': post,
+        'category_selected': 1,
+    }
+    return render(request, 'women/post.html', data)
+
+
+def show_category(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    posts = Women.published.filter(category_id=category.pk)
+    data = {
+        'title': f'Рубрика: {category.title}',
+        'menu': menu,
+        'posts': posts,
+        'category_selected': category.pk,
     }
     return render(request, 'women/index.html', context=data)
 
