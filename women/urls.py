@@ -8,6 +8,7 @@ urlpatterns = [
     path('', index, name='home'),
     path('post/<slug:post_slug>/', show_post, name='post'),
     path('category/<slug:category_slug>/', show_category, name='category'),
+    path('tag/<slug:tag_slug>/', show_tag_postlist, name='tag'),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
     path('addpage/', addpage, name='add_page'),
