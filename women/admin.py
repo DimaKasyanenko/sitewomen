@@ -3,19 +3,36 @@ from django.contrib import admin, messages
 from .models import Women, Category, TagPost, Husband
 
 
+class MarriedFilter(admin.SimpleListFilter):
+    title = 'Статус женщин'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('married', 'Замуженм'),
+            ('single', 'Не замужем')
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'married':
+            return queryset.filter(husband__isnull=False)
+        elif self.value() == 'single':
+            return queryset.filter(husband__isnull=True)
+
+
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'is_published', 'created_at', 'updated_at', 'slug', 'brief_info')
-    list_filter = ('is_published', 'created_at', 'tags')
+    list_filter = (MarriedFilter, 'category', 'is_published', 'created_at', 'tags')
     list_editable = ('is_published',)
-    search_fields = ('title', 'description')
+    search_fields = ('title',)
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
     list_display_links = ('title',)
     list_per_page = 10
     save_on_top = True
     actions_on_top = True
-    actions = ['set_published', 'set_draft']
+    actions = ('set_published', 'set_draft')
 
     @admin.display(description='Краткое описание', ordering='description')
     def brief_info(self, women: Women):
