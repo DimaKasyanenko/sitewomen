@@ -76,5 +76,9 @@ class Husband(models.Model):
     name = models.CharField(max_length=100, verbose_name='Муж')
     age = models.PositiveSmallIntegerField(verbose_name='Возраст', null=True)
 
+    class Meta:
+        verbose_name = 'Муж'
+        verbose_name_plural = 'Мужья'
+
     def __str__(self):
         return self.name
