@@ -31,7 +31,8 @@ class Women(models.Model):
     title = models.CharField('Название', max_length=255)
     slug = models.SlugField('Ссылка', max_length=255, unique=True, db_index=True)
     description = models.TextField('Описание', blank=True)
-    is_published = models.BooleanField('Опубликовано', choices=Status.choices, default=Status.PUBLISHED)
+    is_published = models.BooleanField('Опубликовано', choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
+                                       default=Status.DRAFT)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория', related_name='posts')
     tags = models.ManyToManyField('TagPost', related_name='tags', blank=True, verbose_name='Теги')
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, related_name='wuman', blank=True, null=True,
