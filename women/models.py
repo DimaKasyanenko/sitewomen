@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from wheel.vendored.packaging.tags import Tag
 
 
 class PublishedManager(models.Manager):
