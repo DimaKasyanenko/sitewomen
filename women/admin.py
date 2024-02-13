@@ -9,7 +9,7 @@ class MarriedFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
-            ('married', 'Замуженм'),
+            ('married', 'Замужем'),
             ('single', 'Не замужем')
         ]
 
@@ -22,11 +22,14 @@ class MarriedFilter(admin.SimpleListFilter):
 
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
+    fields = ('title', 'description', 'slug', 'category', 'husband', 'tags', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
+    prepopulated_fields = {"slug": ("title",)}
+    filter_horizontal = ('tags',)
     list_display = ('title', 'category', 'is_published', 'created_at', 'updated_at', 'slug', 'brief_info')
     list_filter = (MarriedFilter, 'category', 'is_published', 'created_at', 'tags')
     list_editable = ('is_published',)
     search_fields = ('title',)
-    date_hierarchy = 'created_at'
     ordering = ('-created_at',)
     list_display_links = ('title',)
     list_per_page = 10
