@@ -11,7 +11,7 @@ class AddPostForm(forms.Form):
                                             'min_length': 'Минимально должно быть 3 символа'
                                             })
     slug = forms.SlugField(max_length=255, label='URL', validators=[
-        MinLengthValidator(5, message=),
+        MinLengthValidator(5),
         MaxLengthValidator(255)
     ])
     description = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 5}), required=False,
