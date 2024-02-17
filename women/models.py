@@ -41,6 +41,7 @@ class Women(models.Model):
 
     title = models.CharField('Название', max_length=255)
     slug = models.SlugField('Ссылка', max_length=255, unique=True, db_index=True)
+    photo = models.ImageField(upload_to='photos/%Y/%m/%d', default=None, null=True, blank=True, verbose_name='Фото')
     description = models.TextField('Описание', blank=True)
     is_published = models.BooleanField('Опубликовано', choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
                                        default=Status.DRAFT)
@@ -98,3 +99,7 @@ class Husband(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UploadFiles(models.Model):
+    file = models.FileField(upload_to='uploads_model')
