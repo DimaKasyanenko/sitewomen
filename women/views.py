@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from women.forms import AddPostForm, UploadFileForm
 from women.models import Women, Category, TagPost, UploadFiles
@@ -51,27 +51,40 @@ class WomenHome(ListView):
     #     return context
 
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Women, slug=post_slug)
-    data = {
-        'title': post.title,
-        'menu': menu,
-        'post': post,
-        'category_selected': 1,
-    }
-    return render(request, 'women/post.html', data)
+# def show_post(request, post_slug):
+#     post = get_object_or_404(Women, slug=post_slug)
+#     data = {
+#         'title': post.title,
+#         'menu': menu,
+#         'post': post,
+#         'category_selected': 1,
+#     }
+#     return render(request, 'women/post.html', data)
 
 
-def show_category(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
-    posts = Women.published.filter(category_id=category.pk).select_related('category')
-    data = {
-        'title': f'Рубрика: {category.title}',
-        'menu': menu,
-        'posts': posts,
-        'category_selected': category.pk,
-    }
-    return render(request, 'women/index.html', context=data)
+class ShowPost(DetailView):
+    model = Women
+    template_name = 'women/post.html'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['post'].title
+        context['menu'] = menu
+        return context
+
+
+# def show_category(request, category_slug):
+#     category = get_object_or_404(Category, slug=category_slug)
+#     posts = Women.published.filter(category_id=category.pk).select_related('category')
+#     data = {
+#         'title': f'Рубрика: {category.title}',
+#         'menu': menu,
+#         'posts': posts,
+#         'category_selected': category.pk,
+#     }
+#     return render(request, 'women/index.html', context=data)
 
 
 class WomenCategory(ListView):
@@ -91,32 +104,33 @@ class WomenCategory(ListView):
         return context
 
 
-def show_tag_postlist(request, tag_slug):
-    tag = get_object_or_404(TagPost, slug=tag_slug)
-    posts = tag.tags.filter(is_published=Women.Status.PUBLISHED).select_related('category')
-    data = {
-        'title': f'Тег: {tag.tag}',
-        'menu': menu,
-        'posts': posts,
-        'category_selected': None,
-    }
-    return render(request, 'women/index.html', context=data)
+# def show_tag_postlist(request, tag_slug):
+#     tag = get_object_or_404(TagPost, slug=tag_slug)
+#     posts = tag.tags.filter(is_published=Women.Status.PUBLISHED).select_related('category')
+#     data = {
+#         'title': f'Тег: {tag.tag}',
+#         'menu': menu,
+#         'posts': posts,
+#         'category_selected': None,
+#     }
+#     return render(request, 'women/index.html', context=data)
 
 
-class WomenTags(ListView):
+class TagPostList(ListView):
     template_name = 'women/index.html'
     context_object_name = 'posts'
     allow_empty = False
 
+    def get_context_data(self, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = TagPost.objects.get(slug=self.kwargs['tag_slug'])
+        context['title'] = 'Тег: ' + tag.tag
+        context['menu'] = menu
+        context['category_selected'] = None
+        return context
+
     def get_queryset(self):
         return Women.published.filter(tags__slug=self.kwargs['tag_slug']).select_related('category')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        tags = context['posts'][0].tags
-        context['title'] = 'Тег - ' + tags.tag
-        context['menu'] = menu
-        return context
 
 
 # def handle_uploaded_file(f):
