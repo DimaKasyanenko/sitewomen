@@ -12,5 +12,7 @@ urlpatterns = [
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
     path('addpage/', AddPage.as_view(), name='add_page'),
+    path('edit/<slug:slug>/', UpdatePage.as_view(), name='edit_page'),
+    path('delete/<slug:slug>/', DeletePage.as_view(), name='edit_page'),
     path('login/', login, name='login'),
 ]
