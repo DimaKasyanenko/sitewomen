@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
@@ -59,6 +61,7 @@ class TagPostList(DataMixin, ListView):
         return Women.published.filter(tags__slug=self.kwargs['tag_slug']).select_related('category')
 
 
+@login_required
 def about(request):
     contact_list = Women.published.all()
     paginator = Paginator(contact_list, 2)
@@ -67,10 +70,15 @@ def about(request):
     return render(request, 'women/about.html', {'title': 'О сайте', 'page_obj': page_obj})
 
 
-class AddPage(DataMixin, CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title: 'Добавление статьи'
+
+    def form_valid(self, form):
+        w = form.save(commit=False)
+        w.author = self.request.user
+        return super().form_valid(form)
 
 
 class UpdatePage(UpdateView):

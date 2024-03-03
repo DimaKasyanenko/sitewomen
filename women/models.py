@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -51,6 +52,9 @@ class Women(models.Model):
                                    verbose_name='Муж')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
+
+    author = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, default=None, null=True,
+                               related_name='posts', verbose_name='Автор')
 
     class Meta:
         verbose_name = 'Женщина'
