@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -14,6 +15,9 @@ class WomenHome(DataMixin, ListView):
     context_object_name = 'posts'
     title_page = 'Главная страница'
     category_selected = 0
+
+    def get_queryset(self):
+        return Women.published.all().select_related('category')
 
 
 class ShowPost(DataMixin, DetailView):
@@ -56,43 +60,14 @@ class TagPostList(DataMixin, ListView):
 
 
 def about(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # handle_uploaded_file(form.cleaned_data['file'])
-            fp = UploadFiles(file=request.FILES['file'])
-            fp.save()
-    else:
-        form = UploadFileForm()
-    data = {
-        'title': 'О сайте',
-        'form': form,
-    }
-    return render(request, 'women/about.html', context=data)
+    contact_list = Women.published.all()
+    paginator = Paginator(contact_list, 2)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'women/about.html', {'title': 'О сайте', 'page_obj': page_obj})
 
 
-# def addpage(request):
-#     if request.method == 'POST':
-#         form = AddPostForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             # # print(form.cleaned_data)
-#             # try:
-#             #     Women.objects.create(**form.cleaned_data)
-#             #     return redirect('home')
-#             # except:
-#             #     form.add_error(None, 'Ошибка добавления поста')
-#             form.save()
-#             return redirect('home')
-#     else:
-#         form = AddPostForm()
-#     data = {
-#         'menu': menu,
-#         'title': 'Добавление статьи',
-#         'form': form
-#     }
-#     return render(request, 'women/addpage.html', data)
-
-class AddPage(CreateView):
+class AddPage(DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title: 'Добавление статьи'

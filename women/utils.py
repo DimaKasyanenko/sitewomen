@@ -2,13 +2,13 @@ menu = [
     {'title': 'О сайте', 'url_name': 'about'},
     {'title': 'Добавить статью', 'url_name': 'add_page'},
     {'title': 'Обратная связь', 'url_name': 'contact'},
-    {'title': 'Войти', 'url_name': 'login'}
 ]
 
 
 class DataMixin:
     title_page = None
     category_selected = None
+    paginate_by = 2
     extra_context = {}
 
     def __init__(self):
@@ -17,9 +17,6 @@ class DataMixin:
 
         if self.category_selected is not None:
             self.extra_context['category_selected'] = self.category_selected
-
-        if 'menu' not in self.extra_context:
-            self.extra_context['menu'] = menu
 
     def get_mixin_context(self, context, **kwargs):
         context['menu'] = menu
